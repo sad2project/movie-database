@@ -16,3 +16,6 @@ def test_cannot_create_disc_without_media():
     except TypeError as e:
         pass
 
+
+def test():
+    pass

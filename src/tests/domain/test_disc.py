@@ -11,11 +11,17 @@ from domain.disc import *
 
 def test_cannot_create_disc_without_media():
     try:
-        disc = Disc(media=None, name='Test Disc', format=Format.TBD)
+        disc = Disc(id=DiscID.new_disc(), media=[], name='Test Disc', format=Format.TBD)
         assert False
     except TypeError as e:
-        pass
+        assert 'Invalid media' in str(e)
 
 
-def test():
+def test_can_access_id():
+    disc = Disc.restore_movie(id=DiscID(1), name='Test Disc', media=Media.new(), format=Format.TBD)
+
+    assert disc.id == DiscID(1)
+
+
+def test_that():
     pass

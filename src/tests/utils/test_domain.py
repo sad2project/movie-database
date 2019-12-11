@@ -1,3 +1,5 @@
+import pytest
+
 from utils.domain import *
 
 
@@ -137,3 +139,37 @@ def test_id_string():
     a = IdDouble(1)
 
     assert str(a) == 'TABLE ID 1'
+
+
+def test_id_new_test_not_new():
+    sut = ID('TABLE', 1)
+
+    assert not sut.is_new()
+
+
+def test_id_new_test_is_new():
+    sut = ID('TABLE', None)
+
+    assert sut.is_new()
+
+
+def test_non_empty_with_empty():
+    with pytest.raises(TypeError):
+        non_empty([])
+
+
+def test_non_empty_with_filled():
+    sut = [5]
+
+    assert non_empty(sut) == sut
+
+
+def test_non_new_id_with_new_id():
+    with pytest.raises(TypeError):
+        ID('TABLE', None).require_not_new()
+
+
+def test_non_new_id_with_existing_id():
+    sut = ID('TABLE', 1)
+
+    assert sut.require_not_new() == sut

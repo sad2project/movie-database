@@ -3,37 +3,32 @@ from utils.domain import DomainError
 
 from pytest import raises
 from ...helpers import *
-integers = strategies.integers
+integers = strat.integers
 from random import randint
 
 
 #DiscNumber
 ################################################################################
-@properties(disc_num=integers())
+@properties(disc_num=integers(max_value=0))
 def test_disc_num_cannot_be_less_than_1(disc_num):
-    assume(disc_num < 1)
     with raises(DomainError):
         DiscNumber(disc_num, 2)
 
 
-@properties(disc_num=integers(), out_of=integers())
+@properties(disc_num=integers(min_value=1), out_of=integers(min_value=1))
 def test_disc_num_cannot_be_greater_than_max(disc_num, out_of):
-    assume(out_of >= 2)
-    assume(disc_num > 0)
     with raises(DomainError):
         DiscNumber(disc_num + out_of, out_of)
 
 
-@properties(max=integers())
+@properties(max=integers(max_value=1))
 def test_disc_num_max_cannot_be_less_than_2(max):
-    assume(max < 2)
     with raises(DomainError):
         DiscNumber(max - 14, max)
 
 
-@properties(out_of=integers())
+@properties(out_of=integers(min_value=2))
 def test_can_access_disc_num_pieces(out_of):
-    assume(out_of >= 2)
     disc_num = randint(1, out_of)
     sut = DiscNumber(disc_num, out_of)
 

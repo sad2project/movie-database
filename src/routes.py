@@ -1,6 +1,6 @@
-from utils.router import Router
+from flask.blueprints import Blueprint
 
-routes = Router()
+routes = Blueprint('main', __name__)
 
 
 @routes.route('/')

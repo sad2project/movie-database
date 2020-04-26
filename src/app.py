@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 
 def run():
-    routes.register_routes(app)
+    app.register_blueprint(routes)
     app.run(port=5000, debug=True)
 
 

@@ -3,6 +3,8 @@ import pytest
 from utils.domain import *
 
 
+# Test Doubles
+################################################################################
 class ValueDouble(Value):
     def __init__(self, foo, bar):
         super().__init__(foo, bar)
@@ -27,6 +29,8 @@ class IdDouble(ID):
         super().__init__("TABLE", id)
 
 
+# Value
+################################################################################
 def test_value_equals():
     a = ValueDouble(1, 2)
     b = ValueDouble(1, 2)
@@ -78,7 +82,9 @@ def test_value_get_bar():
 
     assert a.bar == 2
     
-    
+
+# Entity
+################################################################################
 def test_entity_equals_with_all_same():
     a = EntityDouble(1, 2)
     b = EntityDouble(1, 2)
@@ -123,6 +129,8 @@ def test_entity_string():
     assert str(a) == 'EntityDouble(id=1)'
 
 
+# ID
+################################################################################
 def test_id_id():
     a = IdDouble(1)
 
@@ -153,8 +161,21 @@ def test_id_new_test_is_new():
     assert sut.is_new()
 
 
+def test_non_new_id_with_new_id():
+    with pytest.raises(DomainError):
+        ID('TABLE', None).require_not_new()
+
+
+def test_non_new_id_with_existing_id():
+    sut = ID('TABLE', 1)
+
+    assert sut.require_not_new() == sut
+
+
+# non_empty
+################################################################################
 def test_non_empty_with_empty():
-    with pytest.raises(TypeError):
+    with pytest.raises(DomainError):
         non_empty([])
 
 
@@ -164,12 +185,24 @@ def test_non_empty_with_filled():
     assert non_empty(sut) == sut
 
 
-def test_non_new_id_with_new_id():
-    with pytest.raises(TypeError):
-        ID('TABLE', None).require_not_new()
+# is_numeric
+################################################################################
+def test_is_numeric_with_spaces():
+    with pytest.raises(DomainError):
+        is_numeric(" ")
 
 
-def test_non_new_id_with_existing_id():
-    sut = ID('TABLE', 1)
+def test_is_numeric_with_leading_zeros():
+    val = "0056482"
+    assert is_numeric(val) == val
 
-    assert sut.require_not_new() == sut
+
+def test_is_numeric_normal_number():
+    val = "65468"
+    assert  is_numeric(val) == val
+
+
+# DomainError
+################################################################################
+def test_can_make_domain_error():
+    DomainError("error message")

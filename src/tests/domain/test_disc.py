@@ -3,6 +3,7 @@ from hypothesis.strategies import one_of, sampled_from, just, builds, integers, 
 import pytest
 
 from domain.disc import *
+from utils.domain import DomainError
 
 
 def properties(**kwargs):
@@ -12,20 +13,20 @@ def properties(**kwargs):
 # MediaID Tests
 ################################################################################
 @properties(id_num=integers())
-def test_MediaID_has_table_name_MEDIA(id_num):
+def MediaID_has_table_name_MEDIA(id_num):
     id = MediaID(id_num)
 
     assert id.table_name == 'MEDIA'
 
 
 @properties(id_num=integers())
-def test_MediaID_has_given_id_number(id_num):
+def MediaID_has_given_id_number(id_num):
     id = MediaID(id_num)
 
     assert id.id == id_num
 
 
-def test_MediaID_new_id_has_None_id():
+def MediaID_new_id_has_None_id():
     id = MediaID.new_media()
 
     assert id.id is None
@@ -34,20 +35,20 @@ def test_MediaID_new_id_has_None_id():
 # DiscID Tests
 ################################################################################
 @properties(id_num=integers())
-def test_DiscID_has_table_name_DISC(id_num):
+def DiscID_has_table_name_DISC(id_num):
     id = DiscID(id_num)
 
     assert id.table_name == 'DISC'
 
 
 @properties(id_num=integers())
-def test_DiscID_has_given_id_number(id_num):
+def DiscID_has_given_id_number(id_num):
     id = DiscID(id_num)
 
     assert id.id == id_num
 
 
-def test_DiscID_new_id_has_None_id():
+def DiscID_new_id_has_None_id():
     id = DiscID.new_disc()
 
     assert id.id is None
@@ -81,19 +82,19 @@ movie_defaults = {'id': id_default, 'name': name_default,
 
 
 @properties(**collection_defaults)
-def test_media_cannot_be_empty(id, name, format, **kwargs):
-    with pytest.raises(TypeError):
+def media_cannot_be_empty(id: DiscID, name: str, format: Format, **kwargs):
+    with pytest.raises(DomainError):
         disc = Disc(id, name, [], format)
 
 
 @properties(**collection_defaults)
-def test_name_cannot_be_empty(id, media, format, **kwargs):
-    with pytest.raises(TypeError):
+def name_cannot_be_empty(id: DiscID, media: List[Media], format: Format, **kwargs):
+    with pytest.raises(DomainError):
         disc = Disc(id, "", media, format)
 
 
 @properties(**collection_defaults)
-def test_can_access_attributes(id, name, media, format):
+def can_access_attributes(id: DiscID, name: str, media: List[Media], format: Format):
     disc = Disc(id, name, media, format)
 
     assert disc.id == id
@@ -103,52 +104,52 @@ def test_can_access_attributes(id, name, media, format):
 
 
 @properties(**movie_defaults)
-def test_restored_movie_cannot_have_new_id(name, media, format, **kwargs):
+def restored_movie_cannot_have_new_id(name: str, media: Media, format: Format, **kwargs):
     with pytest.raises(TypeError):
         disc = Disc.restore_movie(DiscID.new_disc(), name, media, format)
 
 
 @properties(**movie_defaults)
-def test_restored_movie_otherwise_works(id, name, media, format):
+def restored_movie_otherwise_works(id: DiscID, name: str, media: Media, format: Format):
     disc = Disc.restore_movie(id, name, media, format)
 
     assert disc.id == id
     assert disc.name == name
     assert disc.media == [media]
-    assert disc.format == format
+    assert disc.strformat == format
 
 
 @properties(**collection_defaults)
-def test_restored_collection_cannot_have_new_id(name, media, format, **kwargs):
+def restored_collection_cannot_have_new_id(name: str, media: List[Media], format:Format, **kwargs):
     with pytest.raises(TypeError):
         disc = Disc.restore_collection(DiscID.new_disc(), name, media, format)
 
 
 @properties(**collection_defaults)
-def test_restored_collection_otherwise_works(id, name, media, format):
+def restored_collection_otherwise_works(id: DiscID, name: str, media: List[Media], format: Format):
     disc = Disc.restore_collection(id, name, media, format)
 
     assert disc.id == id
     assert disc.name == name
     assert disc.media == media
-    assert disc.format == format
+    assert disc.strformat == format
 
 
 @properties(**movie_defaults)
-def test_new_movie_otherwise_works(name, media, format, **kwargs):
+def new_movie_otherwise_works(name: str, media: Media, format:Format, **kwargs):
     disc = Disc.new_movie(name, media, format)
 
     assert disc.id == DiscID.new_disc()
     assert disc.name == name
     assert disc.media == [media]
-    assert disc.format == format
+    assert disc.strformat == format
 
 
 @properties(**collection_defaults)
-def test_new_collection_otherwise_works(name, media, format, **kwargs):
+def new_collection_otherwise_works(name: str, media: List[Media], format: Format, **kwargs):
     disc = Disc.new_collection(name, media, format)
 
     assert disc.id == DiscID.new_disc()
     assert disc.name == name
     assert disc.media == media
-    assert disc.format == format
+    assert disc.strformat == format

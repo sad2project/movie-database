@@ -43,7 +43,7 @@ class ID(Value):
 
     def require_not_new(self):
         if self.id is None:
-            raise TypeError('ID is not initialized as required')
+            raise DomainError('ID is not initialized as required')
         return self
 
     def is_new(self):
@@ -51,6 +51,10 @@ class ID(Value):
 
     def __str__(self):
         return f'{self.table_name} ID {self.id}'
+
+
+class DomainError(Exception):
+    pass
 
 
 def non_empty(value):
@@ -62,5 +66,13 @@ def non_empty(value):
     :return: given value
     """
     if len(value) == 0:
-        raise TypeError('collection is empty; some values are required')
+        raise DomainError('collection is empty; some values are required')
+    return value
+
+
+def is_numeric(value: str) -> str:
+    try:
+        int(value)
+    except ValueError:
+        raise DomainError("requires a completely numeric string")
     return value

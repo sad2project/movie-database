@@ -11,7 +11,7 @@ class Format(Enum):
 
 class MediaID(ID):
     def __init__(self, id):
-        super().__init__('MEDIA', id)
+        super().__init__(id, table_name='MEDIA')
 
     @staticmethod
     def new_media():
@@ -20,7 +20,7 @@ class MediaID(ID):
 
 class DiscID(ID):
     def __init__(self, id):
-        super().__init__('DISC', id)
+        super().__init__(id, table_name='DISC')
 
     @staticmethod
     def new_disc():

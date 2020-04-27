@@ -1,3 +1,6 @@
+import re
+
+
 class Value:
     def __init__(self, *args):
         self._pieces = args
@@ -30,16 +33,16 @@ class Entity:
 
 
 class ID(Value):
-    def __init__(self, table_name, id, *args):
-        super().__init__(table_name, id, *args)
+    def __init__(self, id, *args, table_name):
+        super().__init__(id, table_name, *args)
 
     @property
     def table_name(self):
-        return self._pieces[0]
+        return self._pieces[1]
 
     @property
     def id(self):
-        return self._pieces[1]
+        return self._pieces[0]
 
     def require_not_new(self):
         if self.id is None:

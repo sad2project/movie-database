@@ -26,7 +26,7 @@ class EntityDouble(Entity):
 
 class IdDouble(ID):
     def __init__(self, id):
-        super().__init__("TABLE", id)
+        super().__init__(id, table_name="TABLE")
 
 
 # Value
@@ -150,24 +150,24 @@ def test_id_string():
 
 
 def test_id_new_test_not_new():
-    sut = ID('TABLE', 1)
+    sut = ID(1, table_name='TABLE')
 
     assert not sut.is_new()
 
 
 def test_id_new_test_is_new():
-    sut = ID('TABLE', None)
+    sut = ID(None, table_name='TABLE')
 
     assert sut.is_new()
 
 
 def test_non_new_id_with_new_id():
     with pytest.raises(DomainError):
-        ID('TABLE', None).require_not_new()
+        ID(None, table_name='TABLE').require_not_new()
 
 
 def test_non_new_id_with_existing_id():
-    sut = ID('TABLE', 1)
+    sut = ID(1, table_name='TABLE')
 
     assert sut.require_not_new() == sut
 

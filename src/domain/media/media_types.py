@@ -4,7 +4,7 @@ from utils.domain import Entity, ID, non_empty
 
 class MediaID(ID):
     def __init__(self, id):
-        super().__init__("MEDIA", id)
+        super().__init__(id, table_name="MEDIA")
 
     @classmethod
     def new(cls):

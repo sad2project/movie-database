@@ -1,3 +1,5 @@
+import re
+
 from utils.domain import Entity, ID, Value, DomainError, non_empty, is_numeric
 
 
@@ -91,6 +93,52 @@ class Imdb:
         :return: a url to the identified title's page on IMDB
         """
         return f"https://imdb.com/title/tt{self.id}"
+
+    def __str__(self):
+        return f'IMDB tt{self.id}'
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({repr(self.id)})'
+
+
+class Name:
+    """
+    Wraps a string to represent the name of something.
+    """
+    def __init__(self, text: str):
+        """
+        Instantiate a @Name with a string to represent a name. Please only use
+        printable characters (as seen in string.printable). Leading and trailing
+        whitespace is stripped out. If the resulting string is empty, a
+        @DomainError will be raised
+        :param text: string to be used as the name
+        """
+        stripped_text = text.strip()
+        if stripped_text == '':
+            raise DomainError('Cannot have an empty name')
+        self.name = stripped_text
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.name})'
+
+
+class EpisodeNumber:
+    """
+    Wraps an integer to represent an episode number in a television show
+    """
+    def __init__(self, number):
+        if number < 1:
+            raise DomainError("Episode Number must be at least 1")
+        self.number = number
+
+    def __str__(self):
+        return f'episode {self.number}'
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.number})'
 
 
 class Slottable:

@@ -128,23 +128,109 @@ def test_disc_num_repr():
 
 # IMDB
 ################################################################################
-def test_cannot_make_empty_imdb_link():
+legal_imdb_link = strat.text(alphabet='0123456789', min_size=1, max_size=30)
+non_digits_pattern = compile(r'\D')
+
+
+def has_non_digits(string):
+    return search(non_digits_pattern, string) is not None
+
+
+def test_cannot_make_empty_imdb():
     with raises(DomainError):
         Imdb("")
 
 
-def test_can_make_imdb_link():
-    Imdb("0417299")
+@properties(id=legal_imdb_link)
+def test_can_make_imdb(id):
+    Imdb(id)
 
 
-def test_imdb_link_cannot_be_non_digits():
+@properties(id=strat.text(min_size=1, max_size=30))
+def test_imdb_cannot_have_non_digits(id: str):
+    assume(has_non_digits(id))
+
     with raises(DomainError):
         Imdb("054654968t")
 
 
-def test_imdb_url_generation():
-    sut = Imdb("555")
+@properties(id=legal_imdb_link)
+def test_imdb_url_generation(id):
+    sut = Imdb(id)
 
     result = sut.url
 
-    assert result == "https://imdb.com/title/tt555"
+    assert result == f'https://imdb.com/title/tt{id}'
+
+
+@properties(id=legal_imdb_link)
+def test_imdb_string(id):
+    sut = Imdb(id)
+
+    assert str(sut) == f'IMDB tt{id}'
+
+
+@properties(id=legal_imdb_link)
+def test_imdb_repr(id):
+    sut = Imdb(id)
+
+    assert repr(sut) == f"Imdb('{id}')"
+
+
+# Name
+################################################################################
+legal_name = strat.builds(str.strip, strat.text(min_size=1, alphabet=string.printable))
+
+
+@properties(text=legal_name)
+def test_can_make_name(text):
+    assume(text.strip() != '')
+    sut = Name(text)
+
+
+def test_name_cannot_be_empty():
+    with raises(DomainError):
+        sut = Name('')
+
+
+@properties(text=strat.text(alphabet=string.whitespace))
+def test_name_cannot_be_only_whitespace(text):
+    with raises(DomainError):
+        sut = Name(text)
+
+
+# EpisodeNumber
+################################################################################
+legal_number = {'number': strat.integers(min_value=1)}
+
+
+@properties(**legal_number)
+def test_can_make_episode_number(number):
+    sut = EpisodeNumber(number)
+
+
+@properties(number=strat.integers(max_value=0))
+def test_episode_number_cannot_be_lower_than_1(number):
+    with raises(DomainError):
+        sut = EpisodeNumber(number)
+
+
+@properties(**legal_number)
+def test_episode_number_has_attributes(number):
+    sut = EpisodeNumber(number)
+
+    assert sut.number == number
+
+
+@properties(**legal_number)
+def test_episode_number_string(number):
+    sut = EpisodeNumber(number)
+
+    assert str(sut) == f'episode {number}'
+
+
+@properties(**legal_number)
+def test_episode_number_repr(number):
+    sut = EpisodeNumber(number)
+
+    assert repr(sut) == f'EpisodeNumber({number})'

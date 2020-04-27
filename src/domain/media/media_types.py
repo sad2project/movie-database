@@ -12,9 +12,15 @@ class MediaID(ID):
 
 
 class Movie(Entity, Slottable):
-    def __init__(self, id: MediaID, name: str, imdb: Imdb):
+    def __init__(self, id: MediaID, name: Name, imdb: Imdb):
         super().__init__(id)
-        self.name = non_empty(name)
+        self.name = name
+        self.imdb = imdb
+
+
+class Episode(Entity):
+    def __init__(self, id: MediaID, number: EpisodeNumber, imdb: Imdb):
+        pass
 
 
 # Movie (id, name, imdb) Slottable!

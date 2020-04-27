@@ -1,7 +1,7 @@
 venv/
 .idea/
 __pycache__/
-*/.hypothesis/
-*/.pytest_cache/
+**/.hypothesis/
+**/.pytest_cache/
 
 *.pyc

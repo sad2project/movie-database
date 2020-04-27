@@ -19,11 +19,43 @@ class DiscNumber(Value):
         self.disc_num = disc_num
         self.out_of = out_of
 
+    @property
+    def next_disc(self):
+        """
+        :return: the next @DiscNumber in this DiscNumber's collection. If this
+        is the last disc in the collection, raises a @DomainError
+        """
+        return DiscNumber(self.disc_num + 1, self.out_of)
+
+    @classmethod
+    def for_collection(cls, size):
+        """
+        Creates a generator that yields all the DiscNumbers in a collection the
+        size of `size`
+        :param size: number of discs in the collection
+        :return: generator that yields the needed DiscNumbers
+        """
+        if size < 2:
+            raise DomainError(
+                "There must be at least 2 discs to constitute the need for a disc number")
+        return cls._for_collection(size)
+
+    @classmethod
+    def _for_collection(cls, size):
+        for i in range(1, size+1):
+            yield cls(i, size)
+
     def __str__(self):
         """
         :return: a string in the format "Disc # of #"
         """
         return self.strformat()
+
+    def __repr__(self):
+        """
+        :return: a string representation that could potentially be instantiated
+        """
+        return f'{self.__class__.__name__}({self.disc_num}, {self.out_of})'
 
     def strformat(self, prefix="Disc ", include_max=True, separator=" of "):
         """
@@ -41,8 +73,7 @@ class DiscNumber(Value):
             prefix = ''
         if include_max:
             return f'{prefix}{self.disc_num}{separator}{self.out_of}'
-        else:
-            return f'{prefix}{self.disc_num}'
+        return f'{prefix}{self.disc_num}'
 
 
 class Imdb:

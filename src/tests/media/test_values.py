@@ -1,8 +1,8 @@
-from domain.media import *
+from media import *
 from utils.domain import DomainError
 
 from pytest import raises
-from ...helpers import *
+from tests.helpers import *
 from random import randint
 from re import compile, search
 import string

@@ -1,9 +1,6 @@
-from domain.media import *
-from utils.domain import DomainError
+from media import *
 
-from pytest import raises
-from hypothesis.strategies import text
-from ...helpers import *
+from tests.helpers import *
 from .test_values import legal_imdb_link
 import string
 

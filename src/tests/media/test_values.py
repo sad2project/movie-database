@@ -1,4 +1,6 @@
 from media import *
+from tests.media.type_builders import disc_numbers_strategy, imdb_link_strategy, \
+    episode_number_value_strategy, name_value_strategy
 from utils.domain import DomainError
 
 from pytest import raises
@@ -18,21 +20,28 @@ def test_disc_num_cannot_be_less_than_1(disc_num):
         DiscNumber(disc_num, 2)
 
 
-@properties(disc_num=integers(min_value=1), out_of=integers(min_value=1))
-def test_disc_num_cannot_be_greater_than_max(disc_num, out_of):
+@strat.composite
+def reversed_disc_nums(draw):
+    second = draw(integers(min_value=1))
+    first = draw(integers(min_value=second+1))
+    return first, second
+
+@properties(nums=reversed_disc_nums())
+def test_disc_num_cannot_be_greater_than_max(nums):
+    disc_num, out_of = nums
     with raises(DomainError):
-        DiscNumber(disc_num + out_of, out_of)
+        DiscNumber(disc_num, out_of)
 
 
 @properties(max=integers(max_value=1))
 def test_disc_num_max_cannot_be_less_than_2(max):
     with raises(DomainError):
-        DiscNumber(max - 14, max)
+        DiscNumber(max, max)
 
 
-@properties(out_of=integers(min_value=2))
-def test_can_access_disc_num_pieces(out_of):
-    disc_num = randint(1, out_of)
+@properties(nums=disc_numbers_strategy())
+def test_can_access_disc_num_pieces(nums):
+    disc_num, out_of = nums
     sut = DiscNumber(disc_num, out_of)
 
     assert sut.disc_num == disc_num
@@ -128,7 +137,6 @@ def test_disc_num_repr():
 
 # IMDB
 ################################################################################
-legal_imdb_link = strat.text(alphabet='0123456789', min_size=1, max_size=30)
 non_digits_pattern = compile(r'\D')
 
 
@@ -141,7 +149,7 @@ def test_cannot_make_empty_imdb():
         Imdb("")
 
 
-@properties(id=legal_imdb_link)
+@properties(id=imdb_link_strategy())
 def test_can_make_imdb(id):
     Imdb(id)
 
@@ -154,7 +162,7 @@ def test_imdb_cannot_have_non_digits(id: str):
         Imdb("054654968t")
 
 
-@properties(id=legal_imdb_link)
+@properties(id=imdb_link_strategy())
 def test_imdb_url_generation(id):
     sut = Imdb(id)
 
@@ -163,14 +171,14 @@ def test_imdb_url_generation(id):
     assert result == f'https://imdb.com/title/tt{id}'
 
 
-@properties(id=legal_imdb_link)
+@properties(id=imdb_link_strategy())
 def test_imdb_string(id):
     sut = Imdb(id)
 
     assert str(sut) == f'IMDB tt{id}'
 
 
-@properties(id=legal_imdb_link)
+@properties(id=imdb_link_strategy())
 def test_imdb_repr(id):
     sut = Imdb(id)
 
@@ -179,10 +187,7 @@ def test_imdb_repr(id):
 
 # Name
 ################################################################################
-legal_name = strat.builds(str.strip, strat.text(min_size=1, alphabet=string.printable))
-
-
-@properties(text=legal_name)
+@properties(text=name_value_strategy())
 def test_can_make_name(text):
     assume(text.strip() != '')
     sut = Name(text)
@@ -201,10 +206,7 @@ def test_name_cannot_be_only_whitespace(text):
 
 # EpisodeNumber
 ################################################################################
-legal_number = {'number': strat.integers(min_value=1)}
-
-
-@properties(**legal_number)
+@properties(number=episode_number_value_strategy())
 def test_can_make_episode_number(number):
     sut = EpisodeNumber(number)
 
@@ -215,21 +217,21 @@ def test_episode_number_cannot_be_lower_than_1(number):
         sut = EpisodeNumber(number)
 
 
-@properties(**legal_number)
+@properties(number=episode_number_value_strategy())
 def test_episode_number_has_attributes(number):
     sut = EpisodeNumber(number)
 
     assert sut.number == number
 
 
-@properties(**legal_number)
+@properties(number=episode_number_value_strategy())
 def test_episode_number_string(number):
     sut = EpisodeNumber(number)
 
     assert str(sut) == f'episode {number}'
 
 
-@properties(**legal_number)
+@properties(number=episode_number_value_strategy())
 def test_episode_number_repr(number):
     sut = EpisodeNumber(number)
 
